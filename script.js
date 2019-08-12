@@ -29,5 +29,6 @@ app.get('/annoucements', async (req, res) => {
     })
     res.send(data);
 });
-const port = process.env.port || 8080;
-app.listen(port, () => console.log(`Listening To Port ${port}`));
+const host = '0.0.0.0';
+const port = process.env.PORT || 3000;
+app.listen(port,host, () => console.log(`Listening To Port ${port}`));
