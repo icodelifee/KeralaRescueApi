@@ -1,10 +1,12 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const express = require('express');
+const apicache = require('apicache');
 
-const app = express();
+let app = express();
+let cache = apicache.middleware;
 
-app.get('/annoucements', async (req, res) => {
+app.get('/annoucements', cache('30 minutes'), async (req, res) => {
     var page = req.query.p;
     var data = [];
     var url = "https://keralarescue.in/announcements/?page=" + page;
@@ -29,6 +31,8 @@ app.get('/annoucements', async (req, res) => {
     })
     res.send(data);
 });
+
+
 const host = '0.0.0.0';
 const port = process.env.PORT || 3000;
 app.listen(port, host, () => console.log(`Listening To Port ${port}`));
