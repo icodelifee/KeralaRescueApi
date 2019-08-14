@@ -2,6 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const express = require('express');
 const apicache = require('apicache');
+const cron = require("node-cron");
 
 let app = express();
 let cache = apicache.middleware;
@@ -30,6 +31,11 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
         });
     })
     res.send(data);
+});
+
+
+cron.schedule("*/30 * * * *", function () {
+    axios.get('https://kerala-rescue-api.herokuapp.com/annoucements?page=1');
 });
 
 
