@@ -9,13 +9,14 @@ let cache = apicache.middleware;
 
 app.get('/annoucements', cache('30 minutes'), async (req, res) => {
     var page = req.query.p;
-    var data = [];
+    let data = [];
     var url = "https://keralarescue.in/announcements/?page=" + page;
     await axios.get(url).then(async (resp) => {
         $ = cheerio.load(resp.data);
-        var ancCards = $('.announcement-cards > .card.priority-very-important, .card.priority-low, .card.priority-high')
-        var p = [];
-        await ancCards.each(async (index, element) => {
+        var ancCards_Vimp = $('.announcement-cards > .card.priority-very-important');
+        var ancCards_Priority = $('.announcement-cards > .card.priority-low, .card.priority-high');
+        await ancCards_Vimp.each(async (index, element) => {
+            let p = [];
             let _date = await $(element).find('.card-title > a').text();
             let _priority = $(element).find('.card-priority').text();
             if (!_date)
@@ -30,7 +31,8 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
             })
         });
     })
-    res.send(data);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(data, null, 4));
 });
 
 
