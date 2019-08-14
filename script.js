@@ -26,7 +26,7 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
             await data.push({
                 "priority": _priority,
                 "timestamp": _date,
-                "data": p
+                "data": p.join('\n\n')
             })
         });
     })
