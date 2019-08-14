@@ -43,12 +43,14 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
             if (!_date)
                 _date = await $(element).find('.card-time > a').text();
             await $(element).find('.card-text').each((i, ele) => {
+                if (i === 0) title = regex.exec($(ele).text())
                 p.push($(ele).text());
             });
 
             await data.push({
                 "priority": _priority,
                 "timestamp": _date,
+                "title": title[0],
                 "data": p.join('\n\n')
             })
         });
