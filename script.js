@@ -38,6 +38,7 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
         });
         await ancCards_Priority.each(async (index, element) => {
             let p = [];
+            let title;            
             let _date = await $(element).find('.card-title > a').text();
             let _priority = $(element).find('.card-priority').text();
             if (!_date)
@@ -46,7 +47,6 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
                 if (i === 0) title = regex.exec($(ele).text())
                 p.push($(ele).text());
             });
-
             await data.push({
                 "priority": _priority,
                 "timestamp": _date,
