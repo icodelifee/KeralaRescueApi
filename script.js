@@ -11,6 +11,7 @@ let cache = apicache.middleware;
 app.get('/annoucements', cache('30 minutes'), async (req, res) => {
     var page = req.query.p;
     let data = [];
+    const regex = /^([^.]+)/;
     var url = "https://keralarescue.in/announcements/?page=" + page;
     await axios.get(url).then(async (resp) => {
         $ = cheerio.load(resp.data);
@@ -18,16 +19,20 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
         var ancCards_Priority = $('.announcement-cards > .card.priority-low, .card.priority-high,.card.priority-medium');
         await ancCards_Vimp.each(async (index, element) => {
             let p = [];
+            let title;
             let _date = await $(element).find('.card-title > a').text();
             let _priority = $(element).find('.card-priority').text();
             if (!_date)
                 _date = await $(element).find('.card-time > a').text();
             await $(element).find('.card-text > p').each((i, ele) => {
+                if (i === 0) title = regex.exec($(ele).text())
                 p.push($(ele).text());
             });
+
             await data.push({
                 "priority": _priority,
                 "timestamp": _date,
+                "title": title,
                 "data": p.join('\n\n')
             })
         });
@@ -40,6 +45,7 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
             await $(element).find('.card-text').each((i, ele) => {
                 p.push($(ele).text());
             });
+
             await data.push({
                 "priority": _priority,
                 "timestamp": _date,
