@@ -3,6 +3,7 @@ const cheerio = require('cheerio');
 const express = require('express');
 const apicache = require('apicache');
 const cron = require("node-cron");
+const async = require('async');
 
 let app = express();
 let cache = apicache.middleware;
@@ -14,7 +15,7 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
     await axios.get(url).then(async (resp) => {
         $ = cheerio.load(resp.data);
         var ancCards_Vimp = $('.announcement-cards > .card.priority-very-important');
-        var ancCards_Priority = $('.announcement-cards > .card.priority-low, .card.priority-high');
+        var ancCards_Priority = $('.announcement-cards > .card.priority-low, .card.priority-high,.card.priority-medium');
         await ancCards_Vimp.each(async (index, element) => {
             let p = [];
             let _date = await $(element).find('.card-title > a').text();
@@ -22,6 +23,21 @@ app.get('/annoucements', cache('30 minutes'), async (req, res) => {
             if (!_date)
                 _date = await $(element).find('.card-time > a').text();
             await $(element).find('.card-text > p').each((i, ele) => {
+                p.push($(ele).text());
+            });
+            await data.push({
+                "priority": _priority,
+                "timestamp": _date,
+                "data": p.join('\n\n')
+            })
+        });
+        await ancCards_Priority.each(async (index, element) => {
+            let p = [];
+            let _date = await $(element).find('.card-title > a').text();
+            let _priority = $(element).find('.card-priority').text();
+            if (!_date)
+                _date = await $(element).find('.card-time > a').text();
+            await $(element).find('.card-text').each((i, ele) => {
                 p.push($(ele).text());
             });
             await data.push({
